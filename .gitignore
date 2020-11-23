@@ -1,0 +1,16 @@
+vendor
+_cache
+*_out/
+VERSION
+.cache
+.gcache
+.idea/**
+*.key
+*.crt
+*.test
+.vscode
+bazel-bin
+bazel-out
+bazel-testlogs
+build_cache
+build_cache/**

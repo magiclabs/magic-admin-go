@@ -1,0 +1,19 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: circleci/golang:1.14
+    steps:
+      - checkout
+      - run:
+          command: make build
+          name: Build command line utility
+      - run:
+          command: make test
+          name: Run tests
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
