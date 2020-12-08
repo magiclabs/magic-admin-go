@@ -20,16 +20,33 @@ func main() {
 		Compiled: time.Now(),
 		Commands: []*cli.Command{
 			{
-				Name: "decode",
-				Aliases: []string{"d"},
-				Usage: "magic-cli decode --did <DID token>",
-				Flags: []cli.Flag{
-					&cli.StringFlag {
-						Name:  "did",
-						Usage: "Did token which must be decoded and validated",
+				Name: "token",
+				Aliases: []string{"t"},
+				Usage: "sub-commands related to working with DID token",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "decode",
+						Usage: "magic-cli token decode --did <DID token>",
+						Flags: []cli.Flag{
+							&cli.StringFlag {
+								Name:  "did",
+								Usage: "Did token which must be decoded",
+							},
+						},
+						Action: decodeDIDToken,
+					},
+					{
+						Name:  "validate",
+						Usage: "magic-cli token validate --did <DID token>",
+						Flags: []cli.Flag{
+							&cli.StringFlag {
+								Name:  "did",
+								Usage: "Did token which must be validated",
+							},
+						},
+						Action: validateDIDToken,
 					},
 				},
-				Action: decodeDIDToken,
 			},
 			{
 				Name: "user",
@@ -68,7 +85,7 @@ func userMetadata(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(meta)
+	fmt.Println(meta.String())
 
 	return nil
 }
@@ -79,7 +96,21 @@ func decodeDIDToken(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(tk.GetClaim())
+	claim := tk.GetClaim()
+	fmt.Println(claim.String())
+
+	return nil
+}
+
+func validateDIDToken(ctx *cli.Context) error {
+	tk, err := token.NewToken(ctx.String("did"))
+	if err != nil {
+		return err
+	}
+
+	if err := tk.Validate(); err != nil {
+		return err
+	}
 
 	return nil
 }
