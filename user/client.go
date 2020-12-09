@@ -68,7 +68,7 @@ func (u *Client) GetMetadataByToken(didToken string) (*magic.Metadata, error) {
 // LogoutByIssuer logout user from magic.link service by issuer.
 func (u *Client) LogoutByIssuer(issuer string) error {
 	r, err := u.client.R().
-		SetQueryParams(map[string]string{"issuer": issuer}).
+		SetBody(map[string]interface{}{"issuer": issuer}).
 		SetHeader(magic.APISecretHeader, u.secret).
 		Post(userLogoutV2)
 	if err != nil {

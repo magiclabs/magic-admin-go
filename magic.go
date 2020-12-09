@@ -26,10 +26,10 @@ var (
 
 // Response default response data structure of magic backend server.
 type Response struct {
-	Data      interface{} `json:"data"`
-	ErrorCode int         `json:"error_code,string,omitempty"`
-	Message   string      `json:"message,omitempty"`
-	Status    string      `json:"status"`
+	Data      interface{} `json:"data, required"`
+	ErrorCode string      `json:"error_code, string, required"`
+	Message   string      `json:"message, required"`
+	Status    string      `json:"status, required"`
 }
 
 // Error implements error interface in case of failed request if the status is not equal to "ok".
@@ -38,7 +38,7 @@ func (r *Response) Error() string {
 		return r.Status
 	}
 
-	return fmt.Sprintf("request is failed, error code: %d, with message: %s",
+	return fmt.Sprintf("request is failed, error code: %s, with message: %s",
 		r.ErrorCode, r.Message)
 }
 
