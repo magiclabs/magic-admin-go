@@ -24,7 +24,7 @@ const testDIDToken = "WyIweGFhNTBiZTcwNzI5Y2E3MDViYTdjOGQwMDE4NWM2ZjJkYTQ3OWQwZm
 	"BiN2ViMTE2ZTJmNWZjOGM1YTcyMmQxZmI5YWYyMzNhYTczYzVjMTcwODM5Y2U1YWQ4MTQxYjl" +
 	"iNDY0MzM4MDk4MmRhNGJmYmIwYjExMjg0OTg4ZjFiXCJ9Il0="
 
-const testSecret = "sk_test_E441E2721E8857D8"
+const testSecret = "sk_test_E123E4567E8901D2"
 
 func TestUserGetMetadata(t *testing.T) {
 	srv := createServerSuccess(t)
@@ -56,7 +56,8 @@ func TestUserGetMetadataWrongSecret(t *testing.T) {
 
 	_, err := uClient.GetMetadataByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
-	require.Equal(t, http.StatusUnauthorized, err.(*magic.Response).ErrorCode)
+	_, ok := err.(*magic.AuthenticationError)
+	require.True(t, ok, "Error type must be AuthenticationError")
 }
 
 func TestUserGetMetadataBackendFailure(t *testing.T) {
@@ -71,7 +72,7 @@ func TestUserGetMetadataBackendFailure(t *testing.T) {
 
 	_, err := uClient.GetMetadataByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
-	require.Equal(t, http.StatusInternalServerError, err.(*magic.Response).ErrorCode)
+	require.Equal(t, magic.ErrorCode("err_code_internal_server_error"), err.(*magic.Error).ErrorCode)
 }
 
 func TestUserLogout(t *testing.T) {
@@ -100,7 +101,7 @@ func TestUserLogoutBackendFailure(t *testing.T) {
 
 	err := uClient.LogoutByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
-	require.Equal(t, http.StatusInternalServerError, err.(*magic.Response).ErrorCode)
+	require.Equal(t, magic.ErrorCode("err_code_internal_server_error"), err.(*magic.Error).ErrorCode)
 }
 
 // createServerSuccess creates internal server which simulates positive case for backend api requests.
@@ -115,7 +116,7 @@ func createServerSuccess(t *testing.T) *httptest.Server {
 		if secret != testSecret {
 			w.WriteHeader(http.StatusUnauthorized)
 			resp := magic.Response{
-				ErrorCode: 401,
+				ErrorCode: "err_code_unauthorized",
 				Message:   "unauthorized",
 				Status:    "fail",
 			}
@@ -131,7 +132,7 @@ func createServerSuccess(t *testing.T) *httptest.Server {
 			switch r.URL.Path {
 			case userInfoV1:
 				resp := magic.Response{
-					Data: &magic.Metadata{
+					Data: &magic.UserInfo{
 						Email:         "user@email.com",
 						Issuer:        "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
 						PublicAddress: "0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
@@ -169,7 +170,7 @@ func createServerFail(t *testing.T) *httptest.Server {
 		case userInfoV1, userLogoutV2:
 			w.WriteHeader(http.StatusInternalServerError)
 			resp := magic.Response{
-				ErrorCode: 500,
+				ErrorCode: "err_code_internal_server_error",
 				Message:   "internal server error",
 				Status:    "fail",
 			}

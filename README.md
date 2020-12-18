@@ -19,7 +19,7 @@ You can use Golang the SDK by specifying it as a dependency:
 go.mod:
 
 ```
-require github.com/magiclabs/magic-admin-go v1.0.0
+require github.com/magiclabs/magic-admin-go latest
 ```
 
 ### Prerequisites

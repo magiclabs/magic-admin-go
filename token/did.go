@@ -101,7 +101,7 @@ func (t *Token) GetNbfGracePeriod() int64 {
 func (t *Token) Validate() error {
 	jsonClaim, err := json.Marshal(t.claim)
 	if err != nil {
-		return err
+		return &DIDTokenError{err}
 	}
 	compactedBuffer := new(bytes.Buffer)
 	if err := json.Compact(compactedBuffer, jsonClaim); err != nil {
@@ -110,17 +110,17 @@ func (t *Token) Validate() error {
 
 	proof, err := hexutil.Decode(t.proof)
 	if err != nil {
-		return err
+		return &DIDTokenError{err}
 	}
 	addr, err := ecRecover(signHash(compactedBuffer.Bytes()).Bytes(), proof)
 	if err != nil {
-		return err
+		return &DIDTokenError{err}
 	}
 
 	// Validate public address that is matched which is specified in proof and claim.
 	pubAddr, err := t.GetPublicAddress()
 	if err != nil {
-		return err
+		return &DIDTokenError{err}
 	}
 	if addr.String() != pubAddr {
 		return ErrNotValidProof

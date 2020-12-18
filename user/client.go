@@ -27,8 +27,8 @@ func NewUserClient(secret string, client *resty.Client) magic.User {
 }
 
 // GetMetadataByIssuer returns metadata by issuer.
-func (u *Client) GetMetadataByIssuer(issuer string) (*magic.Metadata, error) {
-	meta := new(magic.Metadata)
+func (u *Client) GetMetadataByIssuer(issuer string) (*magic.UserInfo, error) {
+	meta := new(magic.UserInfo)
 	respData := new(magic.Response)
 	respData.Data = meta
 
@@ -38,22 +38,22 @@ func (u *Client) GetMetadataByIssuer(issuer string) (*magic.Metadata, error) {
 		SetResult(respData).
 		Get(userInfoV1)
 	if err != nil {
-		return nil, err
+		return nil, &magic.APIConnectionError{Err: err}
 	}
 	if r.IsError() {
-		return nil, r.Error().(error)
+		return nil, magic.WrapError(r, r.Error().(*magic.Error))
 	}
 
 	return meta, nil
 }
 
 // GetMetadataByPublicAddress returns metadata by public address.
-func (u *Client) GetMetadataByPublicAddress(pubAddr string) (*magic.Metadata, error) {
+func (u *Client) GetMetadataByPublicAddress(pubAddr string) (*magic.UserInfo, error) {
 	return u.GetMetadataByIssuer(fmt.Sprintf("did:ethr:%s", pubAddr))
 }
 
 // GetMetadataByToken returns metadata by DID token with decoding and validating it.
-func (u *Client) GetMetadataByToken(didToken string) (*magic.Metadata, error) {
+func (u *Client) GetMetadataByToken(didToken string) (*magic.UserInfo, error) {
 	tk, err := token.NewToken(didToken)
 	if err != nil {
 		return nil, err
@@ -72,10 +72,10 @@ func (u *Client) LogoutByIssuer(issuer string) error {
 		SetHeader(magic.APISecretHeader, u.secret).
 		Post(userLogoutV2)
 	if err != nil {
-		return err
+		return &magic.APIConnectionError{Err: err}
 	}
 	if r.IsError() {
-		return r.Error().(error)
+		return magic.WrapError(r, r.Error().(*magic.Error))
 	}
 
 	return nil
@@ -90,7 +90,7 @@ func (u *Client) LogoutByPublicAddress(pubAddr string) error {
 func (u *Client) LogoutByToken(didToken string) error {
 	tk, err := token.NewToken(didToken)
 	if err != nil {
-		return err
+		return &magic.APIConnectionError{Err: err}
 	}
 	if err := tk.Validate(); err != nil {
 		return err
