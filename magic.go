@@ -2,7 +2,6 @@ package magic
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 
 const (
 	// APIVersion is the version of the library.
-	APIVersion = "v1.0.0"
+	APIVersion = "v0.0.1"
 
 	// APIURL is the URL of the API service backend.
 	APIURL = "https://api.magic.link"
@@ -27,19 +26,9 @@ var (
 // Response default response data structure of magic backend server.
 type Response struct {
 	Data      interface{} `json:"data"`
-	ErrorCode int         `json:"error_code,string,omitempty"`
-	Message   string      `json:"message,omitempty"`
+	ErrorCode ErrorCode   `json:"error_code,string"`
+	Message   string      `json:"message"`
 	Status    string      `json:"status"`
-}
-
-// Error implements error interface in case of failed request if the status is not equal to "ok".
-func (r *Response) Error() string {
-	if r.Status == "ok" {
-		return r.Status
-	}
-
-	return fmt.Sprintf("request is failed, error code: %d, with message: %s",
-		r.ErrorCode, r.Message)
 }
 
 // NewDefaultClient creates backend client with default configuration of retries.
@@ -49,7 +38,7 @@ func NewDefaultClient() *resty.Client {
 
 // NewClient creates new backend client with default api url.
 func NewClient() *resty.Client {
-	return resty.New().SetHostURL(APIURL).SetError(new(Response))
+	return resty.New().SetHostURL(APIURL).SetError(new(Error))
 }
 
 // NewClientWithRetry creates backend client with backoff retry configuration.
