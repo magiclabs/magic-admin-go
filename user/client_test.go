@@ -72,7 +72,8 @@ func TestUserGetMetadataBackendFailure(t *testing.T) {
 
 	_, err := uClient.GetMetadataByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
-	require.Equal(t, magic.ErrorCode("err_code_internal_server_error"), err.(*magic.Error).ErrorCode)
+	_, ok := err.(*magic.APIError)
+	require.True(t, ok, "Error type must be APIError")
 }
 
 func TestUserLogout(t *testing.T) {
@@ -101,7 +102,8 @@ func TestUserLogoutBackendFailure(t *testing.T) {
 
 	err := uClient.LogoutByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
-	require.Equal(t, magic.ErrorCode("err_code_internal_server_error"), err.(*magic.Error).ErrorCode)
+	_, ok := err.(*magic.APIError)
+	require.True(t, ok, "Error type must be APIError")
 }
 
 // createServerSuccess creates internal server which simulates positive case for backend api requests.
