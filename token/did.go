@@ -48,19 +48,19 @@ func NewToken(tk string) (*Token, error) {
 
 	decoded, err := base64.URLEncoding.DecodeString(tk)
 	if err != nil {
-		return nil, err
+		return nil, &DIDTokenError{err}
 	}
 
 	// Decode list of proof and serialized in json claim.
 	var decodePieces []string
 	if err := json.Unmarshal(decoded, &decodePieces); err != nil {
-		return nil, err
+		return nil, &DIDTokenError{err}
 	}
 
 	token.proof = decodePieces[0]
 
 	if err := json.Unmarshal([]byte(decodePieces[1]), &token.claim); err != nil {
-		return nil, err
+		return nil, &DIDTokenError{err}
 	}
 
 	return token, err

@@ -90,7 +90,7 @@ func (u *Client) LogoutByPublicAddress(pubAddr string) error {
 func (u *Client) LogoutByToken(didToken string) error {
 	tk, err := token.NewToken(didToken)
 	if err != nil {
-		return &magic.APIConnectionError{Err: err}
+		return err
 	}
 	if err := tk.Validate(); err != nil {
 		return err
