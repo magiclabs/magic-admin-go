@@ -96,8 +96,8 @@ func (t *Token) GetNbfGracePeriod() int64 {
 	return t.claim.Nbf - nbfGracePeriod
 }
 
-// Validate validates DID token by trying to recover public key using signature data
-// and the hash of the claim message.
+// Validates DID token by recovering public key using signature data and the hash
+// of the claim message.
 func (t *Token) Validate() error {
 	jsonClaim, err := json.Marshal(t.claim)
 	if err != nil {
@@ -152,10 +152,10 @@ func signHash(data []byte) common.Hash {
 //   addr = ecRecover(hash, signature)
 func ecRecover(hash hexutil.Bytes, sig hexutil.Bytes) (common.Address, error) {
 	if len(sig) != 65 {
-		return common.Address{}, fmt.Errorf("signature must be 65 bytes long")
+		return common.Address{}, fmt.Errorf("Signature must be 65 bytes long")
 	}
 	if sig[64] != 27 && sig[64] != 28 {
-		return common.Address{}, fmt.Errorf("invalid Ethereum signature (V is not 27 or 28)")
+		return common.Address{}, fmt.Errorf("Invalid Ethereum signature (V is not 27 or 28)")
 	}
 	sig[64] -= 27
 	rpk, err := crypto.SigToPub(hash, sig)

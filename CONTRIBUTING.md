@@ -14,9 +14,7 @@ Please note we have a **code of conduct**, please follow it in all your interact
 - For features: `feature/#[issue_number]/[descriptive_feature_name]`
 - For chores/the rest: `chore/[descriptive_chore_name]`
 
-4. Install dependencies: `make development`
-5. Source the virtualenv: `source virtualenv_run/bin/activate`
-6. Start building for development
+4. Start building for development
 
 ## Opening a Pull Request
 

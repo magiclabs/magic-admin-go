@@ -1,6 +1,6 @@
 # Magic Admin Golang SDK
 
-The Magic Admin Golang SDK provides convenient ways for developers to interact with Magic API endpoints and an array of utilities to handle [DID Token](https://docs.magic.link/tutorials/decentralized-id).
+The Magic Admin Golang SDK provides convenient ways for developers to interact with Magic API endpoints and an array of utilities to handle [DID Token](https://docs.magic.link/decentralized-id).
 
 ## Table of Contents
 
@@ -14,23 +14,32 @@ The Magic Admin Golang SDK provides convenient ways for developers to interact w
 See the [Magic doc](https://docs.magic.link/admin-sdk/go)!
 
 ## Installation
-You can use Golang the SDK by specifying it as a dependency:
 
-go.mod:
+The SDK requires `Golang 1.13+` and Go Modules. To make sure your project is using Go Modules, you can look for `go.mod` file in your project's root directory. If it exits, then you are already using the Go Modules. If not, you can follow [this guide](https://blog.golang.org/migrating-to-go-modules) to migrate to Go Modules.
 
+Simply reference `magic-admin-go` in a Go program with an `import` of the SDK:
+
+``` golang
+import (
+    ...
+    "github.com/magiclabs/magic-admin-go"
+    ...
+)
 ```
-require github.com/magiclabs/magic-admin-go latest
+
+Run any of the normal `go` commands (ex: `build`/`install`). The Go toolchain will take care of fetching the SDK automatically.
+
+Alternatively, you can explicitly `go get` the package into a project:
+
+```sh
+go get github.com/magiclabs/magic-admin-go
 ```
-
-### Prerequisites
-
-- Go v1.10.0
 
 ## Command line utility
 
-Command line utility is created for test purposes and can be used for decoding DID token and validating it as well as making api requests to `magic.link` for receiving the data about user, making logout, etc..
-You can simply install it by the command:
+Command line utility is created for testing purposes and can be used for decoding and validating DID tokens. It also provides functionality to retrieve user info.
 
+You can simply install it by the command:
 ```bash
 go install github.com/magiclabs/magic-admin-go/cmd/magic-cli
 ```
@@ -46,7 +55,7 @@ USAGE:
    magic-cli [global options] command [command options] [arguments...]
 
 COMMANDS:
-   decode, d  magic-cli decode --did <DID token>
+   token, t   magic-cli token [decode|validate] --did <DID token>
    user, u    magic-cli -s <secret> user --did <DID token>
    help, h    Shows a list of commands or help for one command
 
@@ -56,10 +65,10 @@ GLOBAL OPTIONS:
 ```
 
 ## Quick Start
+
 Before you start, you will need an API secret key. You can get one from the [Magic Dashboard](https://dashboard.magic.link/). Once you have the API secret key, you can instantiate a Magic object.
 
-Sample code for making a request of receiving metadata from the magic.link:
-
+Sample code to retrieve user info by a [DID token](https://docs.magic.link/decentralized-id):
 ```golang
 package main
 
@@ -73,16 +82,16 @@ import (
 
 func main() {
     m := client.New("<YOUR_API_SECRET_KEY>", magic.NewDefaultClient())
-    meta, err := m.User.GetMetadataByToken("<DID_TOKEN>")
+    userInfo, err := m.User.GetMetadataByToken("<DID_TOKEN>")
     if err != nil {
-        log.Fatalf("error in processing requests: %s", err.Error())
+        log.Fatalf("Error: %s", err.Error())
     }
 
-    fmt.Println(meta)
+    fmt.Println(userInfo)
 }
 ```
 
-How to simply decode and validate DID token separately and read claim encoded into it:
+Sample code to validate a [DID token](https://docs.magic.link/decentralized-id) and retrieve the `claim` and `proof` from the token:
 ```golang
 package main
 
@@ -96,20 +105,21 @@ import (
 func main() {
     tk, err := token.NewToken("<DID_TOKEN>")
     if err != nil {
-        log.Fatalf("error in processing requests: %s", err.Error())
+        log.Fatalf("DID token is malformed: %s", err.Error())
     }
     
     if err := tk.Validate(); err != nil {
-        log.Fatalf("token is not valid: %v", err)
+        log.Fatalf("DID token is invalid: %v", err)
     }
 
     fmt.Println(tk.GetClaim())
+    fmt.Println(tk.GetProof())
 }
 ```
 
 ### Configure Network Strategy
-The `NewClientWithRetry` method create client with `retries`,  `retryWait`, `timeout` arguments for configuring retry options.
-`NewClientWithRetry` returns `*resty.Client` instance which could be configured with any different configuration according official documentation of this library.
+
+The `NewClientWithRetry` method creates a client with `retries`,  `retryWait`, `timeout` options. `NewClientWithRetry` returns a `*resty.Client` instance which can be used with the Magic client.
 
 ```golang
 cl := magic.NewClientWithRetry(5, time.Second, 10 * time.Second)
@@ -117,34 +127,28 @@ m := client.New("<YOUR_API_SECRET_KEY>", cl)
 ```
 
 ## Development
-We would love to have you contributing to this SDK. To get started, you need clone this repository and fetch dependencies.
-To make sure your new code works with the existing SDK, run the test, for the new code test covering is mandatory.
+
+We would love to have you contribute to the SDK. To get started, you will need to clone this repository and fetch the dependencies.
+
+To run the existing tests:
 
 ```bash
 make test
 ```
 
-To build and install magic-cli internally in the system you need to run:
+To build and install magic-cli utility tool, you can run:
 
 ```bash
 make install
 ```
 
-For the building command line utility separately as binary:
+To build magic-cli utility tool separately as a binary, you can run:
 
 ```bash
 make build
 ```
 
-This repository is installed with [pre-commit](https://pre-commit.com/). All of the pre-commit hooks are run automatically with every new commit. This is to keep the codebase styling and format consistent.
-
-You can also run the pre-commit manually. You can find all the pre-commit hooks [here](.pre-commit-config.yaml).
-
-```bash
-pre-commit run
-```
-
-Please also see our [CONTRIBUTING](CONTRIBUTING.md) guide for other information.
+Please also see our [CONTRIBUTING](CONTRIBUTING.md) guide for more information.
 
 ## Changelog
 See [Changelog](CHANGELOG.md)

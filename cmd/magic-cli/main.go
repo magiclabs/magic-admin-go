@@ -22,7 +22,7 @@ func main() {
 			{
 				Name: "token",
 				Aliases: []string{"t"},
-				Usage: "sub-commands related to working with DID token",
+				Usage: "magic-cli token [decode|validate] --did <DID token>",
 				Subcommands: []*cli.Command{
 					{
 						Name:  "decode",
@@ -55,7 +55,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringFlag {
 						Name:  "did",
-						Usage: "Did token used for user metadata receiving",
+						Usage: "Did token used for user info receiving",
 					},
 				},
 				Action: userMetadata,
@@ -80,12 +80,12 @@ func main() {
 func userMetadata(ctx *cli.Context) error {
 	m := client.New(ctx.String("secret"), magic.NewDefaultClient())
 
-	meta, err := m.User.GetMetadataByToken(ctx.String("did"))
+	userInfo, err := m.User.GetMetadataByToken(ctx.String("did"))
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(meta.String())
+	fmt.Println(userInfo.String())
 
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 const (
 	// APIVersion is the version of the library.
-	APIVersion = "v0.0.1"
+	APIVersion = "v0.1.0"
 
 	// APIURL is the URL of the API service backend.
 	APIURL = "https://api.magic.link"
@@ -23,10 +23,10 @@ var (
 	ErrRespQuotaExceeded = errors.New("quota exceeded")
 )
 
-// Response default response data structure of magic backend server.
+// Default response data structure of magic backend server.
 type Response struct {
 	Data      interface{} `json:"data"`
-	ErrorCode ErrorCode   `json:"error_code,string"`
+	ErrorCode ErrorCode   `json:"error_code"`
 	Message   string      `json:"message"`
 	Status    string      `json:"status"`
 }
