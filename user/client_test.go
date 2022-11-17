@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/magiclabs/magic-admin-go"
+	"github.com/magiclabs/magic-admin-go/wallet"
 )
 
 const testDIDToken = "WyIweGFhNTBiZTcwNzI5Y2E3MDViYTdjOGQwMDE4NWM2ZjJkYTQ3OWQwZm" +
@@ -42,6 +43,25 @@ func TestUserGetMetadata(t *testing.T) {
 	assert.Equal(t, "user@email.com", meta.Email)
 	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
 	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
+}
+
+func TestUserGetMetadataWithWallet(t *testing.T) {
+	srv := createServerSuccess(t)
+	defer srv.Close()
+
+	// Replace host url to test one.
+	client := magic.NewDefaultClient()
+	client.SetHostURL(srv.URL)
+
+	uClient := NewUserClient(testSecret, client)
+
+	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.ETH)
+	require.NoError(t, err, "can't create new token")
+
+	assert.Equal(t, "user@email.com", meta.Email)
+	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
+	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
+	assert.NotNil(t, meta.Wallets)
 }
 
 func TestUserGetMetadataWrongSecret(t *testing.T) {
@@ -139,7 +159,7 @@ func createServerSuccess(t *testing.T) *httptest.Server {
 						Issuer:        "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
 						PublicAddress: "0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
 					},
-					Status:    "ok",
+					Status: "ok",
 				}
 				data, err := json.Marshal(resp)
 				require.NoError(t, err, "can't marshal test data")
