@@ -148,8 +148,9 @@ func signHash(data []byte) common.Hash {
 //
 // Note, this function is compatible with eth_sign and personal_sign. As such it recovers
 // the address of:
-//   hash = Keccak256Hash("\x19${byteVersion}Ethereum Signed Message:\n${message length}${message}")
-//   addr = ecRecover(hash, signature)
+//
+//	hash = Keccak256Hash("\x19${byteVersion}Ethereum Signed Message:\n${message length}${message}")
+//	addr = ecRecover(hash, signature)
 func ecRecover(hash hexutil.Bytes, sig hexutil.Bytes) (common.Address, error) {
 	if len(sig) != 65 {
 		return common.Address{}, fmt.Errorf("Signature must be 65 bytes long")

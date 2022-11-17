@@ -33,7 +33,7 @@ type Response struct {
 
 // NewDefaultClient creates backend client with default configuration of retries.
 func NewDefaultClient() *resty.Client {
-	return NewClientWithRetry(3, time.Second, 10 * time.Second)
+	return NewClientWithRetry(3, time.Second, 10*time.Second)
 }
 
 // NewClient creates new backend client with default api url.
