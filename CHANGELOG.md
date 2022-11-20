@@ -6,8 +6,10 @@
 
 #### Changed
 
-- <PR-#ISSUE> ...
+- <PR-#10>
+    Dependency update for module.
 
 #### Added
 
-- <PR-#ISSUE> ...
+- <PR-#10>
+    Added multi-chain wallet for metadata retrieval calls.
