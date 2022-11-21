@@ -24,7 +24,7 @@ func TestDIDTokenDecode(t *testing.T) {
 	proof := "0xaa50be70729ca705ba7c8d00185c6f2da479d0fcde5311ca4ce5b1ba715c8a721c5" +
 		"f1948434f96ff577d7b2b6ad82d3dd5a2457fe6998b137ed9bc08d36e549c1b"
 
-	claim := Claim {
+	claim := Claim{
 		Iat: 1586764270,
 		Ext: 11173528500,
 		Nbf: 1586764270,

@@ -3,7 +3,7 @@ package magic
 import (
 	"encoding/json"
 	"net/http"
-	
+
 	"github.com/go-resty/resty/v2"
 )
 

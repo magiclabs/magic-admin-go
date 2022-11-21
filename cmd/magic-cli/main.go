@@ -15,20 +15,20 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name: "magic-cli",
-		Usage: "command line utility to make requests to api and validate tokens",
+		Name:     "magic-cli",
+		Usage:    "command line utility to make requests to api and validate tokens",
 		Compiled: time.Now(),
 		Commands: []*cli.Command{
 			{
-				Name: "token",
+				Name:    "token",
 				Aliases: []string{"t"},
-				Usage: "magic-cli token [decode|validate] --did <DID token>",
+				Usage:   "magic-cli token [decode|validate] --did <DID token>",
 				Subcommands: []*cli.Command{
 					{
 						Name:  "decode",
 						Usage: "magic-cli token decode --did <DID token>",
 						Flags: []cli.Flag{
-							&cli.StringFlag {
+							&cli.StringFlag{
 								Name:  "did",
 								Usage: "Did token which must be decoded",
 							},
@@ -39,7 +39,7 @@ func main() {
 						Name:  "validate",
 						Usage: "magic-cli token validate --did <DID token>",
 						Flags: []cli.Flag{
-							&cli.StringFlag {
+							&cli.StringFlag{
 								Name:  "did",
 								Usage: "Did token which must be validated",
 							},
@@ -49,11 +49,11 @@ func main() {
 				},
 			},
 			{
-				Name: "user",
+				Name:    "user",
 				Aliases: []string{"u"},
-				Usage: "magic-cli -s <secret> user --did <DID token>",
+				Usage:   "magic-cli -s <secret> user --did <DID token>",
 				Flags: []cli.Flag{
-					&cli.StringFlag {
+					&cli.StringFlag{
 						Name:  "did",
 						Usage: "Did token used for user info receiving",
 					},
@@ -62,7 +62,7 @@ func main() {
 			},
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag {
+			&cli.StringFlag{
 				Name:    "secret",
 				Usage:   "Secret token which will be used for making request to backend api",
 				Aliases: []string{"s"},
@@ -70,7 +70,6 @@ func main() {
 			},
 		},
 	}
-
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
