@@ -27,8 +27,29 @@ const testDIDToken = "WyIweGFhNTBiZTcwNzI5Y2E3MDViYTdjOGQwMDE4NWM2ZjJkYTQ3OWQwZm
 
 const testSecret = "sk_test_E123E4567E8901D2"
 
+var (
+	testDataMagicWallets = []magic.Wallet{
+		{
+			Type:          "SOLANA",
+			Network:       "MAINNET",
+			PublicAddress: "foobar",
+		},
+	}
+	testSuccessData = magic.UserInfo{
+		Email:         "user@email.com",
+		Issuer:        "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
+		PublicAddress: "0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
+	}
+	testSuccessDataWithWallets = magic.UserInfo{
+		Email:         "user@email.com",
+		Issuer:        "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
+		PublicAddress: "0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
+		Wallets:       &testDataMagicWallets,
+	}
+)
+
 func TestUserGetMetadata(t *testing.T) {
-	srv := createServerSuccess(t)
+	srv := createServerSuccess(t, &testSuccessData)
 	defer srv.Close()
 
 	// Replace host url to test one.
@@ -46,7 +67,7 @@ func TestUserGetMetadata(t *testing.T) {
 }
 
 func TestUserGetMetadataWithWallet(t *testing.T) {
-	srv := createServerSuccess(t)
+	srv := createServerSuccess(t, &testSuccessDataWithWallets)
 	defer srv.Close()
 
 	// Replace host url to test one.
@@ -55,17 +76,40 @@ func TestUserGetMetadataWithWallet(t *testing.T) {
 
 	uClient := NewUserClient(testSecret, client)
 
-	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.ETH)
+	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.SOLANA)
 	require.NoError(t, err, "can't create new token")
 
 	assert.Equal(t, "user@email.com", meta.Email)
 	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
 	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
 	assert.NotNil(t, meta.Wallets)
+	assert.Equal(t, 1, len(*meta.Wallets))
+	assert.Equal(t, wallet.SOLANA, (*meta.Wallets)[0].Type)
+}
+
+func TestUserGetMetadataWithAny(t *testing.T) {
+	srv := createServerSuccess(t, &testSuccessDataWithWallets)
+	defer srv.Close()
+
+	// Replace host url to test one.
+	client := magic.NewDefaultClient()
+	client.SetHostURL(srv.URL)
+
+	uClient := NewUserClient(testSecret, client)
+
+	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.ANY)
+	require.NoError(t, err, "can't create new token")
+
+	assert.Equal(t, "user@email.com", meta.Email)
+	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
+	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
+	assert.NotNil(t, meta.Wallets)
+	assert.Equal(t, 1, len(*meta.Wallets))
+	assert.Equal(t, wallet.SOLANA, (*meta.Wallets)[0].Type)
 }
 
 func TestUserGetMetadataWrongSecret(t *testing.T) {
-	srv := createServerSuccess(t)
+	srv := createServerSuccess(t, &testSuccessData)
 	defer srv.Close()
 
 	// Replace host url to test one.
@@ -97,7 +141,7 @@ func TestUserGetMetadataBackendFailure(t *testing.T) {
 }
 
 func TestUserLogout(t *testing.T) {
-	srv := createServerSuccess(t)
+	srv := createServerSuccess(t, &testSuccessData)
 	defer srv.Close()
 
 	// Replace host url to test one.
@@ -127,7 +171,7 @@ func TestUserLogoutBackendFailure(t *testing.T) {
 }
 
 // createServerSuccess creates internal server which simulates positive case for backend api requests.
-func createServerSuccess(t *testing.T) *httptest.Server {
+func createServerSuccess(t *testing.T, data *magic.UserInfo) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Logf("Method: %v", r.Method)
 		t.Logf("Path: %v", r.URL.Path)
@@ -154,11 +198,7 @@ func createServerSuccess(t *testing.T) *httptest.Server {
 			switch r.URL.Path {
 			case userInfoV1:
 				resp := magic.Response{
-					Data: &magic.UserInfo{
-						Email:         "user@email.com",
-						Issuer:        "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
-						PublicAddress: "0x4B73C58370AEfcEf86A6021afCDe5673511376B2",
-					},
+					Data:   data,
 					Status: "ok",
 				}
 				data, err := json.Marshal(resp)
