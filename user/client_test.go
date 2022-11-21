@@ -83,7 +83,7 @@ func TestUserGetMetadataWithWallet(t *testing.T) {
 	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
 	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
 	assert.NotNil(t, meta.Wallets)
-	assert.Equal(t, 1, len(*meta.Wallets))
+	assert.Len(t, *meta.Wallets, 1)
 	assert.Equal(t, wallet.SOLANA, (*meta.Wallets)[0].Type)
 }
 
@@ -104,7 +104,7 @@ func TestUserGetMetadataWithAny(t *testing.T) {
 	assert.Equal(t, "did:ethr:0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.Issuer)
 	assert.Equal(t, "0x4B73C58370AEfcEf86A6021afCDe5673511376B2", meta.PublicAddress)
 	assert.NotNil(t, meta.Wallets)
-	assert.Equal(t, 1, len(*meta.Wallets))
+	assert.Len(t, *meta.Wallets, 1)
 	assert.Equal(t, wallet.SOLANA, (*meta.Wallets)[0].Type)
 }
 
