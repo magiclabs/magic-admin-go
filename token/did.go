@@ -98,7 +98,7 @@ func (t *Token) GetNbfGracePeriod() int64 {
 
 // Validates DID token by recovering public key using signature data and the hash
 // of the claim message.
-func (t *Token) Validate() error {
+func (t *Token) Validate(clientId string) error {
 	jsonClaim, err := json.Marshal(t.claim)
 	if err != nil {
 		return &DIDTokenError{err}
@@ -133,6 +133,10 @@ func (t *Token) Validate() error {
 	}
 	if now < t.GetNbfGracePeriod() {
 		return ErrNbfExpired
+	}
+
+	if t.claim.Aud != clientId {
+		return ErrAudMismatch
 	}
 
 	return nil

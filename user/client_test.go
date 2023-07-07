@@ -27,6 +27,8 @@ const testDIDToken = "WyIweGFhNTBiZTcwNzI5Y2E3MDViYTdjOGQwMDE4NWM2ZjJkYTQ3OWQwZm
 
 const testSecret = "sk_test_E123E4567E8901D2"
 
+const testClientId = "did:magic:731848cc-084e-41ff-bbdf-7f103817ea6b"
+
 var (
 	testDataMagicWallets = []magic.Wallet{
 		{
@@ -56,7 +58,7 @@ func TestUserGetMetadata(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient(testSecret, client)
+	uClient := NewUserClient(testSecret, testClientId, client)
 
 	meta, err := uClient.GetMetadataByToken(testDIDToken)
 	require.NoError(t, err, "can't create new token")
@@ -74,7 +76,7 @@ func TestUserGetMetadataWithWallet(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient(testSecret, client)
+	uClient := NewUserClient(testSecret, testClientId, client)
 
 	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.SOLANA)
 	require.NoError(t, err, "can't create new token")
@@ -95,7 +97,7 @@ func TestUserGetMetadataWithAny(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient(testSecret, client)
+	uClient := NewUserClient(testSecret, testClientId, client)
 
 	meta, err := uClient.GetMetadataByTokenAndWallet(testDIDToken, wallet.ANY)
 	require.NoError(t, err, "can't create new token")
@@ -116,7 +118,7 @@ func TestUserGetMetadataWrongSecret(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient("wrong_secret", client)
+	uClient := NewUserClient("wrong_secret", testClientId, client)
 
 	_, err := uClient.GetMetadataByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
@@ -132,7 +134,7 @@ func TestUserGetMetadataBackendFailure(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient("wrong_secret", client)
+	uClient := NewUserClient("wrong_secret", testClientId, client)
 
 	_, err := uClient.GetMetadataByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
@@ -148,7 +150,7 @@ func TestUserLogout(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient(testSecret, client)
+	uClient := NewUserClient(testSecret, testClientId, client)
 
 	err := uClient.LogoutByToken(testDIDToken)
 	require.NoError(t, err, "can't logout user by DID token")
@@ -162,7 +164,7 @@ func TestUserLogoutBackendFailure(t *testing.T) {
 	client := magic.NewDefaultClient()
 	client.SetHostURL(srv.URL)
 
-	uClient := NewUserClient("wrong_secret", client)
+	uClient := NewUserClient("wrong_secret", testClientId, client)
 
 	err := uClient.LogoutByToken(testDIDToken)
 	require.Error(t, err, "server must return error")
