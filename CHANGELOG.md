@@ -3,16 +3,6 @@
 
 ## `1.0.0` - 07/05/2023
 
-[//]: # ()
-[//]: # (### Added)
-
-[//]: # ()
-[//]: # (- PR-#11: Add Magic Connect Admin SDK support for Token Validation )
-
-[//]: # (    - [Security Enhancement]: Validate `aud` using Magic client ID.)
-
-[//]: # (    - Pull client ID from Magic servers in client constructor.)
-
 ### Summary
 - 🚀 **Added:** Magic Connect developers can now use the Admin SDK to validate DID tokens.
 - ⚠️ **Changed:** After creating the Magic instance, it is now necessary to call a new initialize method for Magic Connect developers that want to utilize the Admin SDK.
