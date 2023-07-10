@@ -43,5 +43,5 @@ func TestDIDTokenDecode(t *testing.T) {
 	assert.Equal(t, proof, token.GetProof())
 	assert.Equal(t, issuer, token.GetIssuer())
 
-	assert.NoError(t, token.Validate(), "token is not valid")
+	assert.NoError(t, token.Validate("did:magic:731848cc-084e-41ff-bbdf-7f103817ea6b"), "token is not valid")
 }

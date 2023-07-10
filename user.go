@@ -27,6 +27,11 @@ type UserInfo struct {
 	Wallets       *[]Wallet `json:"wallets,omitempty"`
 }
 
+type ClientInfo struct {
+	ClientId string `json:"client_id"`
+	AppScope string `json:"app_scope"`
+}
+
 type Wallet struct {
 	Network       string `json:"network"`
 	PublicAddress string `json:"public_address"`

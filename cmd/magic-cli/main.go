@@ -22,7 +22,7 @@ func main() {
 			{
 				Name:    "token",
 				Aliases: []string{"t"},
-				Usage:   "magic-cli token [decode|validate] --did <DID token>",
+				Usage:   "magic-cli token [decode|validate] --did <DID token> [--clientId <Magic Client ID>]",
 				Subcommands: []*cli.Command{
 					{
 						Name:  "decode",
@@ -37,11 +37,16 @@ func main() {
 					},
 					{
 						Name:  "validate",
-						Usage: "magic-cli token validate --did <DID token>",
+						Usage: "magic-cli token validate --did <DID token> --clientId <Magic Client ID>",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
 								Name:  "did",
 								Usage: "Did token which must be validated",
+							},
+							&cli.StringFlag{
+								Name:    "clientId",
+								Usage:   "Magic Client ID to validate the aud field",
+								EnvVars: []string{"MAGIC_CLIENT_ID"},
 							},
 						},
 						Action: validateDIDToken,
@@ -77,7 +82,11 @@ func main() {
 }
 
 func userMetadata(ctx *cli.Context) error {
-	m := client.New(ctx.String("secret"), magic.NewDefaultClient())
+	m, err := client.New(ctx.String("secret"), magic.NewDefaultClient())
+
+	if err != nil {
+		return err
+	}
 
 	userInfo, err := m.User.GetMetadataByToken(ctx.String("did"))
 	if err != nil {
@@ -102,12 +111,13 @@ func decodeDIDToken(ctx *cli.Context) error {
 }
 
 func validateDIDToken(ctx *cli.Context) error {
+
 	tk, err := token.NewToken(ctx.String("did"))
 	if err != nil {
 		return err
 	}
 
-	if err := tk.Validate(); err != nil {
+	if err := tk.Validate(ctx.String("clientId")); err != nil {
 		return err
 	}
 

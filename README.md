@@ -55,7 +55,7 @@ USAGE:
    magic-cli [global options] command [command options] [arguments...]
 
 COMMANDS:
-   token, t   magic-cli token [decode|validate] --did <DID token>
+   token, t   magic-cli token [decode|validate] --did <DID token> [--clientId <Magic Client ID>]
    user, u    magic-cli -s <secret> user --did <DID token>
    help, h    Shows a list of commands or help for one command
 
@@ -81,7 +81,7 @@ import (
 )
 
 func main() {
-    m := client.New("<YOUR_API_SECRET_KEY>", magic.NewDefaultClient())
+    m, err := client.New("<YOUR_API_SECRET_KEY>", magic.NewDefaultClient())
     userInfo, err := m.User.GetMetadataByToken("<DID_TOKEN>")
     if err != nil {
         log.Fatalf("Error: %s", err.Error())
@@ -99,16 +99,24 @@ import (
     "log"
     "fmt"
 
+	"github.com/magiclabs/magic-admin-go/client"
     "github.com/magiclabs/magic-admin-go/token"
 )
 
 func main() {
-    tk, err := token.NewToken("<DID_TOKEN>")
+
+	c, err := client.New("<YOUR_API_SECRET_KEY>", magic.NewDefaultClient())
+
+	if err != nil {
+		log.Fatalf("Unable to initialize client: %s", err.Error())
+	}
+	
+	tk, err := token.NewToken("<DID_TOKEN>")
     if err != nil {
         log.Fatalf("DID token is malformed: %s", err.Error())
     }
     
-    if err := tk.Validate(); err != nil {
+    if err := tk.Validate(c.ClientInfo.ClientId); err != nil {
         log.Fatalf("DID token is invalid: %v", err)
     }
 

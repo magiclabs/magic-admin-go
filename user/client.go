@@ -16,15 +16,17 @@ const (
 )
 
 type Client struct {
-	secret string
-	client *resty.Client
+	secret        string
+	magicClientId string
+	client        *resty.Client
 }
 
 // NewUserClient constructor of user client api.
-func NewUserClient(secret string, client *resty.Client) magic.User {
+func NewUserClient(secret string, magicClientId string, client *resty.Client) magic.User {
 	return &Client{
-		secret: secret,
-		client: client,
+		secret:        secret,
+		magicClientId: magicClientId,
+		client:        client,
 	}
 }
 
@@ -44,7 +46,7 @@ func (u *Client) GetMetadataByTokenAndWallet(didToken string, walletType wallet.
 	if err != nil {
 		return nil, err
 	}
-	if err := tk.Validate(); err != nil {
+	if err := tk.Validate(u.magicClientId); err != nil {
 		return nil, err
 	}
 
@@ -119,7 +121,7 @@ func (u *Client) LogoutByToken(didToken string) error {
 	if err != nil {
 		return err
 	}
-	if err := tk.Validate(); err != nil {
+	if err := tk.Validate(u.magicClientId); err != nil {
 		return err
 	}
 
